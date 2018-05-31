@@ -60,3 +60,10 @@ $string['auth_guardiankey_emailtext_key'] = 'Email text';
 $string['auth_guardiankey_emailtext'] = 'The values enclosed with brackets are variables, e.g., "[IP]" (the client IP used on authentication).';
 $string['auth_guardiankey_emailhtml_key'] = 'Email HTML';
 $string['auth_guardiankey_emailhtml'] = 'The values enclosed with brackets are variables, e.g., "[IP]" (the client IP used on authentication).';
+
+$string['auth_guardiankey_test_key'] = 'Testing mode';
+$string['auth_guardiankey_test'] = 'Will not send e-mail to users in test mode. However, e-mails will be sent to the support address.';
+$string['auth_guardiankey_supportaddr_key'] = 'Support e-mail address';
+$string['auth_guardiankey_supportaddr'] = 'Alerts will all be sent to this e-mail.';
+
+

@@ -74,7 +74,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
           $loginfailed="0";
           $ua=str_replace("'","",$_SERVER['HTTP_USER_AGENT']);
           $ua=str_replace("|","",$ua);
-          $ua=substr($ua,0,50);
+          $ua=substr($ua,0,100);
           $message = $timestamp."|". $agent."|". $service."|". $clientreverse."|". $ip."|". $usernamehash."|". $authmethod."|". $loginfailed."|". $ua."|";
           $cipher = openssl_encrypt($message, AES_256_CBC, $key, 0, $iv);
           $payload=$hashid."|".$cipher;
@@ -145,6 +145,8 @@ class auth_plugin_guardiankey extends auth_plugin_base {
      $emailsubject 	 = get_config('auth_guardiankey', 'emailsubject');
      $emailtext 	  = get_config('auth_guardiankey', 'emailtext');
      $emailhtml 	  = get_config('auth_guardiankey', 'emailhtml');
+     $testmode 	    = get_config('auth_guardiankey', 'test');
+     $supportaddr 	= get_config('auth_guardiankey', 'supportaddr');
      //$dateformat 	  = get_config('auth_guardiankey', 'dateformat');
      //$timeformat 	  = get_config('auth_guardiankey', 'timeformat');
      $date = userdate($event["time"], get_string('strftimedatetimeshort', 'langconfig'));
@@ -193,7 +195,16 @@ class auth_plugin_guardiankey extends auth_plugin_base {
       $emailuser->firstnamephonetic = "";
       $emailuser->lastnamephonetic = "";
       $emailuser->middlename = "";
-      $success = email_to_user($user, $emailuser, $emailsubject, $emailtext, $emailhtml, '', '', true);
+
+  
+      if($testmode != 1)
+        $success = email_to_user($user, $emailuser, $emailsubject, $emailtext, $emailhtml, '', '', true);
+
+      if(strlen(trim($supportaddr))>0){
+        // Send an e-mail for the support address
+        $mailer =& get_mailer();
+        $result = $mailer->send($supportaddr, $emailsubject." (user $emailuser)", $emailhtml, 'quoted-printable', 1);
+      }
       
       
       /*
