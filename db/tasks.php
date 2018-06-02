@@ -18,8 +18,7 @@
  * Definition of auth_guardiankey tasks.
  *
  * @package    auth_guardiankey
- * @category   task
- * @copyright  
+ * @copyright  Paulo Angelo Alves Resende
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

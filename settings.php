@@ -17,8 +17,8 @@
 /**
  * Admin settings and defaults.
  *
- * @package auth_guardiankey
- * @copyright  
+ * @package    auth_guardiankey
+ * @copyright  Paulo Angelo Alves Resende
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -39,6 +39,15 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('auth_guardiankey/hashid',
                 new lang_string('auth_guardiankey_hashid_key', 'auth_guardiankey'),
                 new lang_string('auth_guardiankey_hashid',     'auth_guardiankey'), '', PARAM_RAW_TRIMMED));
+    
+    $settings->add(new admin_setting_configtext('auth_guardiankey/organizationId',
+                new lang_string('auth_guardiankey_orgid_key', 'auth_guardiankey'),
+                new lang_string('auth_guardiankey_orgid',     'auth_guardiankey'), '', PARAM_RAW_TRIMMED));
+    
+    $settings->add(new admin_setting_configtext('auth_guardiankey/authGroupId',
+                new lang_string('auth_guardiankey_authgroupid_key', 'auth_guardiankey'),
+                new lang_string('auth_guardiankey_authgroupid',     'auth_guardiankey'), '', PARAM_RAW_TRIMMED));
+    
     $settings->add(new admin_setting_configtext('auth_guardiankey/key',
                 new lang_string('auth_guardiankey_key_key', 'auth_guardiankey'),
                 new lang_string('auth_guardiankey_key',     'auth_guardiankey'), '', PARAM_RAW_TRIMMED));

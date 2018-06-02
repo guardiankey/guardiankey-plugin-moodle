@@ -17,14 +17,16 @@
 /**
  * GuardianKEY authentication login - prevents user login.
  *
- * @package auth_guardiankey
- * @author Gesiel and Paulo Angelo
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package    auth_guardiankey
+ * @copyright  Paulo Angelo Alves Resende
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/authlib.php');
+
+require_once(dirname(__FILE__).'/ripcord.php');
 
 define('AES_256_CBC', 'aes-256-cbc');
 
@@ -45,41 +47,49 @@ class auth_plugin_guardiankey extends auth_plugin_base {
     function user_authenticated_hook(&$user, $username, $password) {
         global $DB;
 
-        $keyb64 	  = get_config('auth_guardiankey', 'key');
-        $salt   = get_config('auth_guardiankey', 'salt');
-        $ivb64 	  = get_config('auth_guardiankey', 'iv');
-        $hashid  = get_config('auth_guardiankey', 'hashid');
-        $reverse = get_config('auth_guardiankey', 'reverse');
+        $keyb64    = get_config('auth_guardiankey', 'key');
+        $salt      = get_config('auth_guardiankey', 'salt');
+        $ivb64 	   = get_config('auth_guardiankey', 'iv');
+        $hashid    = get_config('auth_guardiankey', 'hashid');
+        $orgid    = get_config('auth_guardiankey', 'orgid');
+        $authgroupid    = get_config('auth_guardiankey', 'authgroupid');
+        $reverse   = get_config('auth_guardiankey', 'reverse');
         $timestamp = time();
-        $usernamehash=md5($username.$salt);
+//         $usernamehash=md5($username.$salt);
 
         if(strlen($hashid)>0){
-          // save userhash
-          if(!$DB->record_exists('auth_guardiankey_user_hash',array('userid' => $user->id, 'userhash' => $usernamehash))){
-            $userhashrecord = new stdClass();
-            $userhashrecord->userid= $user->id;
-            $userhashrecord->userhash= $usernamehash;
-            $DB->insert_record('auth_guardiankey_user_hash', $userhashrecord, $returnid=true, $bulk=false) ;
-          }
+          // save userhash FUTURE IMPLEMENATION
+//           if(!$DB->record_exists('auth_guardiankey_user_hash',array('userid' => $user->id, 'userhash' => $usernamehash))){
+//             $userhashrecord = new stdClass();
+//             $userhashrecord->userid= $user->id;
+//             $userhashrecord->userhash= $usernamehash;
+//             $DB->insert_record('auth_guardiankey_user_hash', $userhashrecord, $returnid=true, $bulk=false) ;
+//           }
 
-	        // Send UDP. 
+	      // Send UDP. 
           $key=base64_decode($keyb64);
           $iv=base64_decode($ivb64);
-          $agent=$hashid;
-          $service="Moodle";
-          $ip=$_SERVER['REMOTE_ADDR'];
-          $clientreverse= ($reverse==1)?  gethostbyaddr($ip) : "";
-          $usernamehash;
-          $authmethod="";
-          $loginfailed="0";
-          $ua=str_replace("'","",$_SERVER['HTTP_USER_AGENT']);
-          $ua=str_replace("|","",$ua);
-          $ua=substr($ua,0,100);
-          $message = $timestamp."|". $agent."|". $service."|". $clientreverse."|". $ip."|". $usernamehash."|". $authmethod."|". $loginfailed."|". $ua."|";
+          
+          $json = new stdClass();
+          $json->generatedTime=$timestamp;
+          $json->agentId=$hashid;
+          $json->organizationId=$hashid;
+          $json->authGroupId=$hashid;
+          $json->service="Moodle";
+          $json->clientReverse = ($reverse==1)?  gethostbyaddr($ip) : "";
+          $json->clientIP=$_SERVER['REMOTE_ADDR'];
+          $json->userName=$username;
+          $json->authMethod="";
+          $json->loginFailed="0";
+          $json->userAgent=substr($_SERVER['HTTP_USER_AGENT'],0,500);
+          $json->psychometricTyped="";
+          $json->psychometricImage="";
+     
+          $message = json_encode(json);
           $cipher = openssl_encrypt($message, AES_256_CBC, $key, 0, $iv);
           $payload=$hashid."|".$cipher;
           $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-          socket_sendto($socket, $payload, strlen($payload), 0, "collector.ids-hogzilla.com", "8888");
+          socket_sendto($socket, $payload, strlen($payload), 0, "collector.guardiankey.net", "8888");
         }
     }
  
@@ -91,10 +101,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
 
         global $DB;
 
-	      $options= array( 'location' =>  'http://ws.ids-hogzilla.com/ws/',
-	                       'uri'      =>  'http://ws.ids-hogzilla.com/ws/');
-
-	      $client=new SoapClient(NULL,$options);
+	    $client = ripcord::xmlrpcClient( 'http://ws.guardiankey.net/ws/' );
 
         $keyb64 = get_config('auth_guardiankey', 'key');
         if(strlen($keyb64)==0){
@@ -105,13 +112,17 @@ class auth_plugin_guardiankey extends auth_plugin_base {
             $ivb64 =  base64_encode($iv);
             $adminuser = $DB->get_record('user', array('id'=>'2'));
             $email = $adminuser->email;
+            
             $hashid =  $client->register($email,$keyb64,$ivb64);
+            
             $salt = md5(rand().rand().rand().rand().$hashid);
 
             if(strlen($hashid)>0){
                 set_config('key', $keyb64, 'auth_guardiankey');
                 set_config('iv', $ivb64, 'auth_guardiankey');
                 set_config('hashid', $hashid, 'auth_guardiankey');
+                set_config('orgid', $hashid, 'auth_guardiankey');
+                set_config('authgroupid', $hashid, 'auth_guardiankey');
                 set_config('salt', $salt, 'auth_guardiankey');
                 set_config('reverse', 1, 'auth_guardiankey');
             }
@@ -123,11 +134,12 @@ class auth_plugin_guardiankey extends auth_plugin_base {
             $iv = base64_decode($ivb64);
             $timestamp = time();
             $timestampcipher = openssl_encrypt($timestamp, AES_256_CBC, $key, 0, $iv);
-            $events= $client->listevents($hashid,$timestampcipher);
+            
+//             $events= $client->listevents($hashid,$timestampcipher);
 
-            foreach( $events as $event ){
-              $this->processEvent($event);
-            }
+//             foreach( $events as $event ){
+//               $this->processEvent($event);
+//             }
 
        }
 
