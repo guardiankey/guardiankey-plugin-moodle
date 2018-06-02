@@ -100,11 +100,12 @@ class auth_plugin_guardiankey extends auth_plugin_base {
     function execute_task() {
 
         global $DB;
-
-	    $client = ripcord::xmlrpcClient( 'http://ws.guardiankey.net/ws/' );
-
+        
         $keyb64 = get_config('auth_guardiankey', 'key');
+        
         if(strlen($keyb64)==0){
+            $guardianKeyWS='http://ws.guardiankey.net/';
+            $client = ripcord::xmlrpcClient( $guardianKeyWS );
             // Create new Key
             $key = openssl_random_pseudo_bytes(32);
             $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(AES_256_CBC));
@@ -113,7 +114,12 @@ class auth_plugin_guardiankey extends auth_plugin_base {
             $adminuser = $DB->get_record('user', array('id'=>'2'));
             $email = $adminuser->email;
             
-            $hashid =  $client->register($email,$keyb64,$ivb64);
+            try {
+                $hashid =  $client->register($email,$keyb64,$ivb64);
+            } catch (Exception $e) {
+                 echo "Error connecting to the GuardianKey WS $guardianKeyWS";
+                 return "";
+            }
             
             $salt = md5(rand().rand().rand().rand().$hashid);
 
@@ -121,8 +127,8 @@ class auth_plugin_guardiankey extends auth_plugin_base {
                 set_config('key', $keyb64, 'auth_guardiankey');
                 set_config('iv', $ivb64, 'auth_guardiankey');
                 set_config('hashid', $hashid, 'auth_guardiankey');
-                set_config('orgid', $hashid, 'auth_guardiankey');
-                set_config('authgroupid', $hashid, 'auth_guardiankey');
+                set_config('organizationId', $hashid, 'auth_guardiankey');
+                set_config('authGroupId', $hashid, 'auth_guardiankey');
                 set_config('salt', $salt, 'auth_guardiankey');
                 set_config('reverse', 1, 'auth_guardiankey');
             }
