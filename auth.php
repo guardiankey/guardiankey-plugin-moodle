@@ -76,8 +76,8 @@ class auth_plugin_guardiankey extends auth_plugin_base {
           $json->organizationId=$hashid;
           $json->authGroupId=$hashid;
           $json->service="Moodle";
-          $json->clientReverse = ($reverse==1)?  gethostbyaddr($ip) : "";
           $json->clientIP=$_SERVER['REMOTE_ADDR'];
+          $json->clientReverse = ($reverse==1)?  gethostbyaddr($json->clientIP) : "";
           $json->userName=$username;
           $json->authMethod="";
           $json->loginFailed="0";
@@ -85,7 +85,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
           $json->psychometricTyped="";
           $json->psychometricImage="";
      
-          $message = json_encode(json);
+          $message = json_encode($json);
           $cipher = openssl_encrypt($message, AES_256_CBC, $key, 0, $iv);
           $payload=$hashid."|".$cipher;
           $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
