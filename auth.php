@@ -86,6 +86,12 @@ class auth_plugin_guardiankey extends auth_plugin_base {
           $json->psychometricImage="";
      
           $message = json_encode($json,JSON_UNESCAPED_SLASHES);
+
+          // some PHP versions needs it.. aff
+          $blocksize=16;
+          $padsize = $blocksize - (strlen($message) % $blocksize);
+          $message=str_pad($message,$padsize," ");
+
           $cipher = openssl_encrypt($message, AES_256_CBC, $key, 0, $iv);
           $payload=$hashid."|".$cipher;
           $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
