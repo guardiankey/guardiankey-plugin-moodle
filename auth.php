@@ -92,7 +92,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
           $padsize = $blocksize - (strlen($message) % $blocksize);
           $message=str_pad($message,$padsize," ");
 
-          $cipher = openssl_encrypt($message, AES_256_CBC, $key, 0, $iv);
+          $cipher = openssl_encrypt($message, 'aes-256-cfb8', $key, 0, $iv);
           $payload=$hashid."|".$cipher;
           $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
           socket_sendto($socket, $payload, strlen($payload), 0, "collector.guardiankey.net", "8888");
@@ -145,7 +145,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
             $key = base64_decode($keyb64);
             $iv = base64_decode($ivb64);
             $timestamp = time();
-            $timestampcipher = openssl_encrypt($timestamp, AES_256_CBC, $key, 0, $iv);
+            $timestampcipher = openssl_encrypt($timestamp, 'aes-256-cfb8', $key, 0, $iv);
             
 //             $events= $client->listevents($hashid,$timestampcipher);
 
