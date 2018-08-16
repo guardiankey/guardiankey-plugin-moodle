@@ -114,7 +114,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
             $client = ripcord::xmlrpcClient( $guardianKeyWS );
             // Create new Key
             $key = openssl_random_pseudo_bytes(32);
-            $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(AES_256_CBC));
+            $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(AES_256_CFB8));
             $keyb64 = base64_encode($key);
             $ivb64 =  base64_encode($iv);
             $adminuser = $DB->get_record('user', array('id'=>'2'));
