@@ -44,7 +44,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
         $this->config = get_config('auth_guardiankey');
     }
 
-    function user_authenticated_hook(&$user, $username, $password) {
+    function user_authenticated_hook(&$user, $username, $password, $loginfailed=0) {
         global $DB;
 
         $keyb64    = get_config('auth_guardiankey', 'key');
@@ -80,10 +80,11 @@ class auth_plugin_guardiankey extends auth_plugin_base {
           $json->clientReverse = ($reverse==1)?  gethostbyaddr($json->clientIP) : "";
           $json->userName=$username;
           $json->authMethod="";
-          $json->loginFailed="0";
+          $json->loginFailed=$loginfailed;
           $json->userAgent=substr($_SERVER['HTTP_USER_AGENT'],0,500);
           $json->psychometricTyped="";
           $json->psychometricImage="";
+          $json->userEmail=$user->email;
      
           $message = json_encode($json,JSON_UNESCAPED_SLASHES);
 
