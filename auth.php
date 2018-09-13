@@ -314,7 +314,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
      * @return bool
      */
     function can_be_manually_set() {
-        return true;
+        return false;
     }
 
 
