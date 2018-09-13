@@ -22,7 +22,7 @@ class api {
         
         $authobj = new auth_plugin_guardiankey();
         $user="";
-        $user = $DB->get_record('user', array('id'=>$userid->userid));
+        $user = $DB->get_record('user', array('id'=>$userid));
         
         $authobj->user_authenticated_hook($user, $username, "", 1);
         return true;
