@@ -51,8 +51,8 @@ class auth_plugin_guardiankey extends auth_plugin_base {
         $salt      = get_config('auth_guardiankey', 'salt');
         $ivb64 	   = get_config('auth_guardiankey', 'iv');
         $hashid    = get_config('auth_guardiankey', 'hashid');
-        $orgid    = get_config('auth_guardiankey', 'orgid');
-        $authgroupid    = get_config('auth_guardiankey', 'authgroupid');
+        $orgid    = get_config('auth_guardiankey', 'organizationId');
+        $authgroupid    = get_config('auth_guardiankey', 'authGroupId');
         $reverse   = get_config('auth_guardiankey', 'reverse');
         $timestamp = time();
 //         $usernamehash=md5($username.$salt);
@@ -73,8 +73,8 @@ class auth_plugin_guardiankey extends auth_plugin_base {
           $json = new stdClass();
           $json->generatedTime=$timestamp;
           $json->agentId=$hashid;
-          $json->organizationId=$hashid;
-          $json->authGroupId=$hashid;
+          $json->organizationId=$orgid;
+          $json->authGroupId=$authgroupid;
           $json->service="Moodle";
           $json->clientIP=$_SERVER['REMOTE_ADDR'];
           $json->clientReverse = ($reverse==1)?  gethostbyaddr($json->clientIP) : "";
@@ -94,7 +94,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
           $message=str_pad($message,$padsize," ");
 
           $cipher = openssl_encrypt($message, 'aes-256-cfb8', $key, 0, $iv);
-          $payload=$hashid."|".$cipher;
+          $payload=$authgroupid."|".$cipher;
           $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
           socket_sendto($socket, $payload, strlen($payload), 0, "collector.guardiankey.net", "8888");
         }
