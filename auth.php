@@ -31,8 +31,6 @@ require_once(dirname(__FILE__).'/ripcord.php');
 define('AES_256_CBC', 'aes-256-cbc');
 
 
-
-
 class auth_plugin_guardiankey extends auth_plugin_base {
 
 
