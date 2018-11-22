@@ -84,7 +84,7 @@ if ($ADMIN->fulltree) {
     
     $settings->add(new admin_setting_configselect('auth_guardiankey/active',
         new lang_string('auth_guardiankey_active_key', 'auth_guardiankey'),
-        new lang_string('auth_guardiankey_active',     'auth_guardiankey'), 1, array( '0' => new lang_string('no')  , '1' => new lang_string('yes') )));
+        new lang_string('auth_guardiankey_active',     'auth_guardiankey'), 0, array( '0' => new lang_string('no')  , '1' => new lang_string('yes') )));
     
     $settings->add(new admin_setting_configselect('auth_guardiankey/test',
                 new lang_string('auth_guardiankey_test_key', 'auth_guardiankey'),
