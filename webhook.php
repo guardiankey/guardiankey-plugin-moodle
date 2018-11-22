@@ -48,32 +48,33 @@ function getGKConf() {
 function processEvent($eventData){
  
      $userid = $DB->get_record('auth_guardiankey_user_hash', array('userhash'=>$event["userhash"]));
-     $user = $DB->get_record('user', array('id'=>$userid->userid));
-     $emailsubject 	 = get_config('auth_guardiankey', 'emailsubject');
-     $emailtext 	  = get_config('auth_guardiankey', 'emailtext');
-     $emailhtml 	  = get_config('auth_guardiankey', 'emailhtml');
-     $testmode 	    = get_config('auth_guardiankey', 'test');
-     $supportaddr 	= get_config('auth_guardiankey', 'supportaddr');
-     //$dateformat 	  = get_config('auth_guardiankey', 'dateformat');
-     //$timeformat 	  = get_config('auth_guardiankey', 'timeformat');
-     $date = userdate($event["time"], get_string('strftimedatetimeshort', 'langconfig'));
-     $time = userdate($event["time"], get_string('strftimetime', 'langconfig'));
+     $user   = $DB->get_record('user', array('id'=>$userid->userid));
+     $emailsubject = get_config('auth_guardiankey', 'emailsubject');
+     $emailtext    = get_config('auth_guardiankey', 'emailtext');
+     $emailhtml    = get_config('auth_guardiankey', 'emailhtml');
+     $testmode 	   = get_config('auth_guardiankey', 'test');
+     $supportaddr  = get_config('auth_guardiankey', 'supportaddr');
+     $date         = userdate($eventData["generatedTime"], get_string('strftimedatetimeshort', 'langconfig'));
+     $time         = userdate($eventData["generatedTime"], get_string('strftimetime', 'langconfig'));
 
-      $emailhtml=str_replace("[IP]",$event["ip"],$emailhtml);
-      $emailhtml=str_replace("[IP_REVERSE]",$event["ip_reverse"],$emailhtml);
+
+      $emailhtml=str_replace("[IP]",$event["clientIP"],$emailhtml);
+      $emailhtml=str_replace("[IP_REVERSE]",$event["clientReverse"],$emailhtml);
       $emailhtml=str_replace("[CITY]",$event["city"],$emailhtml);
-      $emailhtml=str_replace("[USER_AGENT]",$event["useragent"],$emailhtml);
-      $emailhtml=str_replace("[SYSTEM]",$event["system"],$emailhtml);
+      $emailhtml=str_replace("[COUNTRY]",$event["country"],$emailhtml);
+      $emailhtml=str_replace("[USER_AGENT]",$event["client_ua"],$emailhtml);
+      $emailhtml=str_replace("[SYSTEM]",$event["service"],$emailhtml);
       $emailhtml=str_replace("[DATE]",$date,$emailhtml);
       $emailhtml=str_replace("[TIME]",$time,$emailhtml);
       $emailhtml=str_replace("[]","",$emailhtml);
       $emailhtml=str_replace("()","",$emailhtml);
       
-      $emailtext=str_replace("[IP]",$event["ip"],$emailtext);
-      $emailtext=str_replace("[IP_REVERSE]",$event["ip_reverse"],$emailtext);
+      $emailtext=str_replace("[IP]",$event["clientIP"],$emailtext);
+      $emailtext=str_replace("[IP_REVERSE]",$event["clientReverse"],$emailtext);
       $emailtext=str_replace("[CITY]",$event["city"],$emailtext);
-      $emailtext=str_replace("[USER_AGENT]",$event["useragent"],$emailtext);
-      $emailtext=str_replace("[SYSTEM]",$event["system"],$emailtext);
+      $emailtext=str_replace("[COUNTRY]",$event["country"],$emailtext);
+      $emailtext=str_replace("[USER_AGENT]",$event["client_ua"],$emailtext);
+      $emailtext=str_replace("[SYSTEM]",$event["service"],$emailtext);
       $emailtext=str_replace("[DATE]",$date,$emailtext);
       $emailtext=str_replace("[TIME]",$time,$emailtext);
       $emailtext=str_replace("[]","",$emailtext);
@@ -94,7 +95,7 @@ function processEvent($eventData){
       $emailuser->middlename = "";
 
   
-      if($testmode != 1)
+      if($testmode != "1")
         $success = email_to_user($user, $emailuser, $emailsubject, $emailtext, $emailhtml, '', '', true);
 
       if(strlen(trim($supportaddr))>0){

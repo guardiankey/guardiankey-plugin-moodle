@@ -115,7 +115,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
             
             $GK=new guardiankey($GKConf);
             
-            if($active == "yes"){
+            if($active == "1"){
                 try {
                     
                     $GKReturn=json_decode($GK->checkaccess($username,$user->email));
