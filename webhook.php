@@ -46,7 +46,7 @@ function getGKConf() {
     
     
 function processEvent($eventData){
- 
+     global $DB,$CFG; 
 //      $userid = $DB->get_record('auth_guardiankey_user_hash', array('userhash'=>$eventData["userhash"]));
 //      $user   = $DB->get_record('user', array('id'=>$userid->userid));
 
