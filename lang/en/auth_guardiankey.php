@@ -17,6 +17,8 @@ $string['auth_guardiankey_reverse_key'] = 'DNS reverse lookup';
 $string['auth_guardiankey_reverse'] = 'Make a DNS reverse lookup for the user\'s IP address.';
 $string['auth_guardiankey_salt_key'] = 'Salt';
 $string['auth_guardiankey_salt'] = 'Salt used to cipher the local username and send it for intelligent analysis.';
+$string['auth_guardiankey_service_key'] = 'Service name';
+$string['auth_guardiankey_service'] = 'Anything used to identify your Moodle instance. You can insert just "Moodle".';
 $string['auth_guardiankeyemailsettingheader']= 'Email template settings';
 $string['auth_guardiankey_emailsubject_default'] = 'Security Alert!';
 $string['auth_guardiankey_emailtext_default'] = '
@@ -64,6 +66,9 @@ $string['auth_guardiankey_emailtext_key'] = 'Email text';
 $string['auth_guardiankey_emailtext'] = 'The values enclosed with brackets are variables, e.g., "[IP]" (the client IP used on authentication).';
 $string['auth_guardiankey_emailhtml_key'] = 'Email HTML';
 $string['auth_guardiankey_emailhtml'] = 'The values enclosed with brackets are variables, e.g., "[IP]" (the client IP used on authentication).';
+
+$string['auth_guardiankey_active_key'] = 'Active mode';
+$string['auth_guardiankey_active'] = ' ATTENTION: if YES, it may block users if the risk is too high. You can change the blocking threshold in at https://panel.guardiankey.io';
 
 $string['auth_guardiankey_test_key'] = 'Testing mode';
 $string['auth_guardiankey_test'] = 'Will not send e-mail to users in test mode. However, e-mails will be sent to the support address.';

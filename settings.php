@@ -54,9 +54,15 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('auth_guardiankey/iv',
                 new lang_string('auth_guardiankey_iv_key', 'auth_guardiankey'),
                 new lang_string('auth_guardiankey_iv',     'auth_guardiankey'), '', PARAM_RAW_TRIMMED));
+    
     $settings->add(new admin_setting_configtext('auth_guardiankey/salt',
                 new lang_string('auth_guardiankey_salt_key', 'auth_guardiankey'),
                 new lang_string('auth_guardiankey_salt',     'auth_guardiankey'), '', PARAM_RAW_TRIMMED));
+    
+    $settings->add(new admin_setting_configtext('auth_guardiankey/service',
+                new lang_string('auth_guardiankey_service_key', 'auth_guardiankey'),
+                new lang_string('auth_guardiankey_service',     'auth_guardiankey'), '', PARAM_RAW_TRIMMED));
+    
     $settings->add(new admin_setting_configselect('auth_guardiankey/reverse',
                 new lang_string('auth_guardiankey_reverse_key', 'auth_guardiankey'),
                 new lang_string('auth_guardiankey_reverse',     'auth_guardiankey'), 1, array(new lang_string('no') ,new lang_string('yes')  )));
@@ -74,9 +80,16 @@ if ($ADMIN->fulltree) {
                 new lang_string('auth_guardiankey_emailhtml_key', 'auth_guardiankey'),
                 new lang_string('auth_guardiankey_emailhtml',     'auth_guardiankey'), $emailhtmldefault ));
 
+    
+    
+    $settings->add(new admin_setting_configselect('auth_guardiankey/active',
+        new lang_string('auth_guardiankey_active_key', 'auth_guardiankey'),
+        new lang_string('auth_guardiankey_active',     'auth_guardiankey'), 1, array(new lang_string('no')  ,new lang_string('yes') )));
+    
     $settings->add(new admin_setting_configselect('auth_guardiankey/test',
                 new lang_string('auth_guardiankey_test_key', 'auth_guardiankey'),
                 new lang_string('auth_guardiankey_test',     'auth_guardiankey'), 1, array(new lang_string('no')  ,new lang_string('yes') )));
+    
     $settings->add(new admin_setting_configtext('auth_guardiankey/supportaddr',
                 new lang_string('auth_guardiankey_supportaddr_key', 'auth_guardiankey'),
                 new lang_string('auth_guardiankey_supportaddr',     'auth_guardiankey'), "", PARAM_RAW_TRIMMED));
