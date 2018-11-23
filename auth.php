@@ -118,7 +118,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
             if($active == "1"){
                 try {
                     
-                    $GKReturn=json_decode($GK->checkaccess($username,$user->email,$loginfailed));
+                    $GKReturn=json_decode($GK->checkaccess($username,$user->email,$loginfailed),1);
                     if($GKReturn['response']=='BLOCK'){
                         $this->logout();
                     }
