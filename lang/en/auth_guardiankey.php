@@ -74,5 +74,6 @@ $string['auth_guardiankey_test_key'] = 'Testing mode';
 $string['auth_guardiankey_test'] = 'Will not send e-mail to users in test mode. However, e-mails will be sent to the support address.';
 $string['auth_guardiankey_supportaddr_key'] = 'Support e-mail address';
 $string['auth_guardiankey_supportaddr'] = 'Alerts will all be sent to this e-mail.';
-
+$string['privacy:metadata:guardiankey'] = 'In order to integrate with a remote GuardianKey service, user data needs to be exchanged with that service.';
+$string['privacy:metadata:guardiankey:userid'] = 'The userid is sent from Moodle to allow you to check if access is valid using the remote system.';
 

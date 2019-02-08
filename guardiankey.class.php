@@ -88,10 +88,17 @@ class guardiankey
     function sendevent($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
     {
         $GKconfig = $this->GKconfig;
-        $cipher = $this->create_message($username, $useremail, $attempt, $eventType);
-        $payload = $GKconfig['authgroupid'] . "|" . $cipher;
-        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-        socket_sendto($socket, $payload, strlen($payload), 0, "collector.guardiankey.net", "8888");
+        $guardianKeyWS = 'https://api.guardiankey.io/sendevent';
+        $message = $this->create_message($username, $useremail, $attempt, $eventType);
+		$tmpdata = new stdClass();
+        $tmpdata->id = $GKconfig['authgroupid'];
+        $tmpdata->message = $message;
+        $data = $this->_json_encode($tmpdata);
+
+        $ch = new \curl();
+        $curl->setHeader('Content-Type', 'application/json');
+        $curl->post($guardianKeyWS,$data);
+        $return = $curl->response->json;
     }
 
     function checkaccess($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
@@ -104,21 +111,12 @@ class guardiankey
         $tmpdata->message = $message;
         $data = $this->_json_encode($tmpdata);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/json',
-            'Content-Length: ' . strlen($data)
-        ));
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-//         curl_setopt($ch, CURLOPT_VERBOSE, true);
-        $return = curl_exec($ch);
-        $info = curl_getinfo($ch);
-        curl_close($ch);
+        $ch = new \curl();
+        $curl->setHeader('Content-Type', 'application/json');
+        $curl->post($guardianKeyWS,$data);
+        $return = $curl->response->json;
         
-        
+          
         try {
             $foo = json_decode($return);
             return $return;
