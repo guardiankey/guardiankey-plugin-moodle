@@ -1,6 +1,7 @@
 <?php
 
 define('AES_256_CBC', 'aes-256-cbc');
+require_once($CFG->libdir.'/filelib.php');
 
 class guardiankey
 {
@@ -15,25 +16,10 @@ class guardiankey
                                 'reverse' => "True" /* If you will locally perform a reverse DNS resolution */
                                 );
     
-    function check_extensions()
-    {
-        $nook=False;
-        $extensions=array("curl");
-        
-        foreach($extensions as $ext){
-            if ( !extension_loaded ($ext) )
-            {
-                echo "You have to install the PHP extension $ext\n";
-                $nook=1;
-            }
-        }
-        if($nook)
-            exit;
-    }
+
 
     function __construct($GKconfig=null)
     {
-        $this->check_extensions();
         if($GKconfig!=null)
             $this->GKconfig = $GKconfig;
     }
@@ -95,10 +81,9 @@ class guardiankey
         $tmpdata->message = $message;
         $data = $this->_json_encode($tmpdata);
 
-        $ch = new \curl();
+        $curl = new \curl();
         $curl->setHeader('Content-Type', 'application/json');
-        $curl->post($guardianKeyWS,$data);
-        $return = $curl->response->json;
+        $response = $curl->post($guardianKeyWS,$data);
     }
 
     function checkaccess($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
@@ -111,10 +96,9 @@ class guardiankey
         $tmpdata->message = $message;
         $data = $this->_json_encode($tmpdata);
 
-        $ch = new \curl();
+        $curl = new \curl();
         $curl->setHeader('Content-Type', 'application/json');
-        $curl->post($guardianKeyWS,$data);
-        $return = $curl->response->json;
+        $return = $curl->post($guardianKeyWS,$data);
         
           
         try {
@@ -162,15 +146,8 @@ class guardiankey
                 'notify_data' => base64_encode($notify_data_json)
             );
         }
-        
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-//         curl_setopt($ch, CURLOPT_VERBOSE, true);
-        $returned = curl_exec($ch);
-        curl_close($ch);
+        $curl = new \curl();
+        $returned =  $curl->post($guardianKeyWS,$data);
         $returns = @json_decode($returned);
         if ($returns === null) {
             throw new Exception('An error ocurred: ' . $returned);
