@@ -102,7 +102,7 @@ class auth_plugin_guardiankey extends auth_plugin_base {
         
         $GKConf=$this->getGKConf();
         
-        if(strlen($GKConf['agentid'])>0){
+        if(strlen($GKConf['agentid'])>0 and $user->id){
           // save userhash FUTURE IMPLEMENATION
 //           if(!$DB->record_exists('auth_guardiankey_user_hash',array('userid' => $user->id, 'userhash' => $usernamehash))){
 //             $userhashrecord = new stdClass();
