@@ -71,12 +71,12 @@ function sendevent($username, $useremail="", $attempt = "0", $eventType = 'Authe
     {
        $GKconfig = $this->GKconfig;
         $guardianKeyWS = 'https://api.guardiankey.io/sendevent';
-        $message = $this->create_messagev1($username, $useremail, $attempt, $eventType);
+        $message = $this->create_message($username, $useremail, $attempt, $eventType);
         $tmpdata = new stdClass();
         $tmpdata->id = $GKconfig['authgroupid'];
         $tmpdata->message = $message;
+        $tmpdata->hash = hash("sha256", $message.$keyb64.$ivb64);
         $data = $this->_json_encode($tmpdata);
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
         curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
