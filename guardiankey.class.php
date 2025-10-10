@@ -63,45 +63,66 @@ class guardiankey
             $json->event_type=$eventType; // "Authentication" "Bad access"  ou "Registration"
             $json->userEmail=$useremail;
             $tmpmessage = $this->_json_encode($json);
-            $blocksize = 8;
-            $padsize = $blocksize - (strlen($tmpmessage) % $blocksize);
-            $message = str_pad($tmpmessage, $padsize, " ");
-            $cipher = openssl_encrypt($message, 'aes-256-cfb8', $key, 0, $iv);
-            return $cipher;
+            return $tmpmessage;
         }
     }
 
-    function sendevent($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
+function sendevent($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
     {
-        $GKconfig = $this->GKconfig;
+       $GKconfig = $this->GKconfig;
         $guardianKeyWS = 'https://api.guardiankey.io/sendevent';
-        $message = $this->create_message($username, $useremail, $attempt, $eventType);
-		$tmpdata = new stdClass();
-        $tmpdata->id = $GKconfig['authgroupid'];
-        $tmpdata->message = $message;
-        $data = $this->_json_encode($tmpdata);
-
-        $curl = new \curl();
-        $curl->setHeader('Content-Type', 'application/json');
-        $response = $curl->post($guardianKeyWS,$data);
-    }
-
-    function checkaccess($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
-    {
-        $GKconfig = $this->GKconfig;
-        $guardianKeyWS = 'https://api.guardiankey.io/checkaccess';
-        $message = $this->create_message($username, $useremail, $attempt, $eventType);
+        $message = $this->create_messagev1($username, $useremail, $attempt, $eventType);
         $tmpdata = new stdClass();
         $tmpdata->id = $GKconfig['authgroupid'];
         $tmpdata->message = $message;
         $data = $this->_json_encode($tmpdata);
 
-        $curl = new \curl();
-        $curl->setHeader('Content-Type', 'application/json');
-        $return = $curl->post($guardianKeyWS,$data);
-        
-          
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data)
+        ));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $return = curl_exec($ch);
+        curl_close($ch);
+    }
+
+ function checkaccess($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
+    {
         try {
+        $GKconfig = $this->GKconfig;
+        $guardianKeyWS = 'https://api.guardiankey.io/v2/checkaccess';
+        $keyb64 = $GKconfig['key'];
+        $ivb64 = $GKconfig['iv'];
+        $message = $this->create_message($username, $useremail, $attempt, $eventType);
+        $tmpdata = new stdClass();
+        $tmpdata->id = $GKconfig['authgroupid'];
+        $tmpdata->message = $message;
+        $tmpdata->hash = hash("sha256", $message.$keyb64.$ivb64);
+
+        $data = $this->_json_encode($tmpdata);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 4);
+        curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data)
+        ));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        //curl_setopt($ch, CURLOPT_VERBOSE, true);
+        $return = curl_exec($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
+        
+        
             $foo = json_decode($return);
             return $return;
         } catch (Exception $e) {
